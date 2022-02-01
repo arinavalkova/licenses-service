@@ -1,7 +1,7 @@
 package ru.shift.baldezh.licenses.service.repository;
 
-import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.CrudRepository;
 import ru.shift.baldezh.licenses.service.repository.model.UserInfoEntity;
 
-public interface UserRepository extends Repository<UserInfoEntity, Long> {
+public interface UserRepository extends CrudRepository<UserInfoEntity, Long> {
 }
