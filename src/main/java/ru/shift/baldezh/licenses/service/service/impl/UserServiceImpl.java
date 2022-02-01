@@ -5,6 +5,8 @@ import ru.shift.baldezh.licenses.service.repository.UserRepository;
 import ru.shift.baldezh.licenses.service.repository.model.UserInfoEntity;
 import ru.shift.baldezh.licenses.service.service.UserService;
 
+import java.util.Optional;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -25,8 +27,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void getUserById(Long id) {
-        userRepository.findById(id);
+    public Optional<UserInfoEntity> getUserById(Long id) {
+        return userRepository.findById(id);
     }
 
     @Override
