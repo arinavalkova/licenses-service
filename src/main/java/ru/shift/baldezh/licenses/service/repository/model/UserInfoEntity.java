@@ -1,5 +1,7 @@
 package ru.shift.baldezh.licenses.service.repository.model;
 
+import ru.shift.baldezh.licenses.service.model.UserType;
+
 import javax.persistence.*;
 
 @Entity
@@ -13,7 +15,6 @@ public class UserInfoEntity {
     @Column(name = "mail", nullable = false)
     private String mail;
 
-    @ManyToOne
-    @JoinColumn(name = "type", nullable = false)
-    private UserTypeEntity type;
+    @Column(name = "type", nullable = false)
+    private UserType type;
 }
