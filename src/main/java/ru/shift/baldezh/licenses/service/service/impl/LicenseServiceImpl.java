@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class LicenseServiceImpl implements LicenseService {
@@ -72,7 +73,9 @@ public class LicenseServiceImpl implements LicenseService {
 
     @Override
     public List<Long> getLicenseIds(GetLicenseListForm form) {
-        return new ArrayList<>();
+        long userId = form.getUserId();
+        List<LicenseEntity> list = licenseRepository.getAllByUserId(userId);
+        return list.stream().map(LicenseEntity::getLicenseId).collect(Collectors.toList());
     }
 
     @Override
