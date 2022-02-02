@@ -1,6 +1,7 @@
 package ru.shift.baldezh.licenses.service.service.impl;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 import ru.shift.baldezh.licenses.service.model.LicenseCheckResponse;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseListForm;
@@ -12,10 +13,7 @@ import ru.shift.baldezh.licenses.service.service.LicenseService;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -29,13 +27,14 @@ public class LicenseServiceImpl implements LicenseService {
     private final LicenseRepository licenseRepository;
     private final LicenseCryptographyService licenseCryptographyService;
 
+
     public LicenseServiceImpl(LicenseRepository licenseRepository, LicenseCryptographyService licenseCryptographyService) {
         this.licenseRepository = licenseRepository;
         this.licenseCryptographyService = licenseCryptographyService;
     }
 
     @Override
-    public String generateLicense(NewLicenseForm form, OutputStream stream) throws IOException {
+    public LicenseEntity generateLicense(NewLicenseForm form) {
         int userId = form.getUserId();
 
         Date currentDate = new Date();
@@ -53,22 +52,19 @@ public class LicenseServiceImpl implements LicenseService {
 
         licenseEntity.setUserId(userId);
 
-        long licenseId = licenseRepository.save(licenseEntity).getLicenseId();
+        licenseEntity = licenseRepository.save(licenseEntity);
 
-        writeLicenseEntityToStream(licenseEntity, stream);
-
-        return licenseId + "_license_for_" + userId;
+        return licenseEntity;
     }
 
     @Override
-    public String findLicenseById(GetLicenseForm form, long licenseId, OutputStream stream) throws IOException {
+    public LicenseEntity findLicenseById(GetLicenseForm form, long licenseId) {
         long userId = form.getUserId();
         LicenseEntity licenseEntity = licenseRepository.findLicenseEntityByUserIdAndLicenseId(userId, licenseId);
         if (licenseEntity == null) {
             throw new EntityNotFoundException();
         }
-        writeLicenseEntityToStream(licenseEntity, stream);
-        return licenseId + "_license_for_" + userId;
+        return licenseEntity;
     }
 
     @Override
@@ -79,14 +75,8 @@ public class LicenseServiceImpl implements LicenseService {
     }
 
     @Override
-    public LicenseCheckResponse checkLicense(InputStream stream) {
+    public LicenseCheckResponse checkLicense(MultipartFile file) {
+        //TODO
         return new LicenseCheckResponse();
-    }
-
-    private void writeLicenseEntityToStream(LicenseEntity licenseEntity, OutputStream stream) throws IOException {
-        stream.write(licenseEntity.getCreationDate().toString().getBytes(StandardCharsets.UTF_8));
-        stream.write(licenseEntity.getExpirationDate().toString().getBytes(StandardCharsets.UTF_8));
-        stream.write(licenseEntity.getSign().getBytes(StandardCharsets.UTF_8));
-        stream.write(licenseEntity.getMail().getBytes(StandardCharsets.UTF_8));
     }
 }
