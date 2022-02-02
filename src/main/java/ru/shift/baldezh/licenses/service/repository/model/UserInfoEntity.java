@@ -17,4 +17,37 @@ public class UserInfoEntity {
 
     @Column(name = "type", nullable = false)
     private UserType type;
+
+    @Override
+    public String toString() {
+        return "UserInfoEntity{" +
+                "userId=" + userId +
+                ", mail='" + mail + '\'' +
+                ", type=" + type +
+                '}';
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public void setMail(String mail) {
+        this.mail = mail;
+    }
+
+    public UserType getType() {
+        return type;
+    }
+
+    public void setType(UserType type) {
+        this.type = type;
+    }
 }
