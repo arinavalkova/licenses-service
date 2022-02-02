@@ -8,6 +8,7 @@ import ru.shift.baldezh.licenses.service.model.forms.license.NewLicenseForm;
 import ru.shift.baldezh.licenses.service.repository.LicenseRepository;
 import ru.shift.baldezh.licenses.service.repository.UserRepository;
 import ru.shift.baldezh.licenses.service.repository.model.LicenseEntity;
+import ru.shift.baldezh.licenses.service.repository.model.UserInfoEntity;
 import ru.shift.baldezh.licenses.service.service.LicenseService;
 
 import java.io.IOException;
@@ -45,6 +46,8 @@ public class LicenseServiceImpl implements LicenseService {
         licenseEntity.setSign("sign"); //TODO
 
         licenseEntity.setMail(form.getMail());
+
+        licenseEntity.setUserId(userId);
 
         long licenseId = licenseRepository.save(licenseEntity).getLicenseId();
 

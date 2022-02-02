@@ -1,8 +1,6 @@
 package ru.shift.baldezh.licenses.service.repository.model;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Date;
 
 public class LicenseEntity {
@@ -21,6 +19,10 @@ public class LicenseEntity {
 
     @Column(name = "mail", nullable = false)
     private String mail;
+
+    @ManyToOne (optional=false, cascade=CascadeType.ALL)
+    @JoinColumn(name="user_id")
+    private long userId;
 
     public long getLicenseId() {
         return licenseId;
@@ -60,5 +62,13 @@ public class LicenseEntity {
 
     public void setMail(String mail) {
         this.mail = mail;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 }
