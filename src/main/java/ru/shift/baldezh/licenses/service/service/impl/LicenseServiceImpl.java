@@ -10,6 +10,7 @@ import ru.shift.baldezh.licenses.service.repository.model.LicenseEntity;
 import ru.shift.baldezh.licenses.service.service.LicenseCryptographyService;
 import ru.shift.baldezh.licenses.service.service.LicenseService;
 
+import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -53,18 +54,20 @@ public class LicenseServiceImpl implements LicenseService {
 
         long licenseId = licenseRepository.save(licenseEntity).getLicenseId();
 
-        stream.write(licenseEntity.getCreationDate().toString().getBytes(StandardCharsets.UTF_8));
-        stream.write(licenseEntity.getExpirationDate().toString().getBytes(StandardCharsets.UTF_8));
-        stream.write(licenseEntity.getSign().getBytes(StandardCharsets.UTF_8));
-        stream.write(licenseEntity.getMail().getBytes(StandardCharsets.UTF_8));
+        writeLicenseEntityToStream(licenseEntity, stream);
 
         return licenseId + "_license_for_" + userId;
     }
 
     @Override
-    public String findLicenseById(GetLicenseForm form, long licenseId, OutputStream stream) {
-        /* TODO: implement */
-        return "license";
+    public String findLicenseById(GetLicenseForm form, long licenseId, OutputStream stream) throws IOException {
+        long userId = form.getUserId();
+        LicenseEntity licenseEntity = licenseRepository.findLicenseEntityByUserIdAndLicenseId(userId, licenseId);
+        if (licenseEntity == null) {
+            throw new EntityNotFoundException();
+        }
+        writeLicenseEntityToStream(licenseEntity, stream);
+        return licenseId + "_license_for_" + userId;
     }
 
     @Override
@@ -75,5 +78,12 @@ public class LicenseServiceImpl implements LicenseService {
     @Override
     public LicenseCheckResponse checkLicense(InputStream stream) {
         return new LicenseCheckResponse();
+    }
+
+    private void writeLicenseEntityToStream(LicenseEntity licenseEntity, OutputStream stream) throws IOException {
+        stream.write(licenseEntity.getCreationDate().toString().getBytes(StandardCharsets.UTF_8));
+        stream.write(licenseEntity.getExpirationDate().toString().getBytes(StandardCharsets.UTF_8));
+        stream.write(licenseEntity.getSign().getBytes(StandardCharsets.UTF_8));
+        stream.write(licenseEntity.getMail().getBytes(StandardCharsets.UTF_8));
     }
 }
