@@ -3,6 +3,8 @@ package ru.shift.baldezh.licenses.service.repository.model;
 import javax.persistence.*;
 import java.util.Date;
 
+@Entity
+@Table(name = "license")
 public class LicenseEntity {
     @Id
     @GeneratedValue
@@ -20,7 +22,6 @@ public class LicenseEntity {
     @Column(name = "mail", nullable = false)
     private String mail;
 
-    @ManyToOne (optional=false, cascade=CascadeType.ALL)
     @JoinColumn(name="user_id")
     private long userId;
 
