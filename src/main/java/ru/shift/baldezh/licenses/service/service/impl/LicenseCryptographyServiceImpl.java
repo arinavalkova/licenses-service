@@ -6,8 +6,14 @@ import ru.shift.baldezh.licenses.service.model.LicenseCheckResponse;
 import ru.shift.baldezh.licenses.service.repository.model.LicenseEntity;
 import ru.shift.baldezh.licenses.service.service.LicenseCryptographyService;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.security.*;
+
 @Component
 public class LicenseCryptographyServiceImpl implements LicenseCryptographyService {
+
     @Override
     public void sign(LicenseEntity entity) {
         entity.setSign("TODO"); //TODO
