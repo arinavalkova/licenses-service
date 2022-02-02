@@ -1,23 +1,23 @@
 package ru.shift.baldezh.licenses.service.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import ru.shift.baldezh.licenses.service.model.LicenseCheckResponse;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseListForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.NewLicenseForm;
+import ru.shift.baldezh.licenses.service.repository.model.LicenseEntity;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
 public interface LicenseService {
-    /* Returns Filename for license file of type .txt */
-    String generateLicense(NewLicenseForm form, OutputStream stream) throws IOException;
 
-    /* Returns Filename for license file of type .txt */
-    String findLicenseById(GetLicenseForm form, long licenseId, OutputStream stream);
+    LicenseEntity generateLicense(NewLicenseForm form) throws IOException;
+
+    LicenseEntity findLicenseById(GetLicenseForm form, long licenseId) throws IOException;
 
     List<Long> getLicenseIds(GetLicenseListForm form);
 
-    LicenseCheckResponse checkLicense(InputStream stream);
+    LicenseCheckResponse checkLicense(MultipartFile file);
 }

@@ -7,10 +7,13 @@ import ru.shift.baldezh.licenses.service.model.LicenseCheckResponse;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseListForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.NewLicenseForm;
+import ru.shift.baldezh.licenses.service.repository.model.LicenseEntity;
 import ru.shift.baldezh.licenses.service.service.LicenseService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -24,32 +27,35 @@ public class LicenseController {
     }
 
     @GetMapping("new")
-    public void getNewLicense(
+    public ResponseEntity<LicenseEntity> getNewLicense(
             @RequestBody NewLicenseForm form,
             HttpServletResponse response) {
         try {
-            response.setContentType("application/txt");
-            String fileName = licenseService.generateLicense(form, response.getOutputStream());
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + ".txt\"");
-            response.flushBuffer();
+            LicenseEntity licenseEntity = licenseService.generateLicense(form);
+            String fileName = licenseEntity.getLicenseId() + "_license_for_" + form.getUserId();
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + ".json\"");
+
+            return ResponseEntity.ok(licenseEntity);
         } catch (IOException e) {
             e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
         }
     }
 
     @GetMapping("{licenseId}")
-    public void getLicenseById(
+    public ResponseEntity<LicenseEntity> getLicenseById(
             @PathVariable("licenseId") long licenseId,
             @RequestBody GetLicenseForm form,
             HttpServletResponse response
     ) {
         try {
-            response.setContentType("application/txt");
-            String fileName = licenseService.findLicenseById(form, licenseId, response.getOutputStream());
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + ".txt\"");
-            response.flushBuffer();
+            LicenseEntity licenseEntity = licenseService.findLicenseById(form, licenseId);
+            String fileName = licenseEntity.getLicenseId() + "_license_for_" + form.getUserId();
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + ".json\"");
+            return ResponseEntity.ok(licenseEntity);
         } catch (IOException e) {
             e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -64,13 +70,8 @@ public class LicenseController {
     public ResponseEntity<LicenseCheckResponse> checkLicense(
             @RequestParam("file") MultipartFile file
     ) {
-        try {
-            return ResponseEntity.ok(
-                    licenseService.checkLicense(file.getInputStream())
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.internalServerError().build();
-        }
+        return ResponseEntity.ok(
+                licenseService.checkLicense(file)
+        );
     }
 }
