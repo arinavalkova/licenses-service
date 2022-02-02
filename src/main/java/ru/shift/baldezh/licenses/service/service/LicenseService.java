@@ -14,7 +14,7 @@ public interface LicenseService {
     String generateLicense(NewLicenseForm form, OutputStream stream);
 
     /* Returns Filename for license file of type .txt */
-    String findLicenseById(GetLicenseForm form, OutputStream stream);
+    String findLicenseById(GetLicenseForm form, long licenseId, OutputStream stream);
 
     List<Long> getLicenseIds(GetLicenseListForm form);
 

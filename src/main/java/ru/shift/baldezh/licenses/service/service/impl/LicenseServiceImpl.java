@@ -21,7 +21,7 @@ public class LicenseServiceImpl implements LicenseService {
     }
 
     @Override
-    public String findLicenseById(GetLicenseForm form, OutputStream stream) {
+    public String findLicenseById(GetLicenseForm form, long licenseId, OutputStream stream) {
         /* TODO: implement */
         return "license";
     }
