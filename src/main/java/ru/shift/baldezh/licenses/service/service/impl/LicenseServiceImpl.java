@@ -6,9 +6,8 @@ import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseListForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.NewLicenseForm;
 import ru.shift.baldezh.licenses.service.repository.LicenseRepository;
-import ru.shift.baldezh.licenses.service.repository.UserRepository;
 import ru.shift.baldezh.licenses.service.repository.model.LicenseEntity;
-import ru.shift.baldezh.licenses.service.repository.model.UserInfoEntity;
+import ru.shift.baldezh.licenses.service.service.LicenseCryptographyService;
 import ru.shift.baldezh.licenses.service.service.LicenseService;
 
 import java.io.IOException;
@@ -24,10 +23,13 @@ import java.util.List;
 public class LicenseServiceImpl implements LicenseService {
 
     private static final int EXPIRE_TIME_SPAN = 31;
-    private final LicenseRepository licenseRepository;
 
-    public LicenseServiceImpl(LicenseRepository licenseRepository) {
+    private final LicenseRepository licenseRepository;
+    private final LicenseCryptographyService licenseCryptographyService;
+
+    public LicenseServiceImpl(LicenseRepository licenseRepository, LicenseCryptographyService licenseCryptographyService) {
         this.licenseRepository = licenseRepository;
+        this.licenseCryptographyService = licenseCryptographyService;
     }
 
     @Override
@@ -43,7 +45,7 @@ public class LicenseServiceImpl implements LicenseService {
         c.add(Calendar.DAY_OF_MONTH, EXPIRE_TIME_SPAN);
         licenseEntity.setExpirationDate(c.getTime());
 
-        licenseEntity.setSign("sign"); //TODO
+        licenseCryptographyService.sign(licenseEntity);
 
         licenseEntity.setMail(form.getMail());
 
