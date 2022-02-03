@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.security.*;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 @Component
@@ -42,16 +43,15 @@ public class KeyPairServiceImpl implements KeyPairService {
     private void generateKeys() throws NoSuchAlgorithmException, IOException {
         try (
                 FileOutputStream publicFileStream = new FileOutputStream(PUBLIC_FILE_NAME);
-                FileOutputStream privateFileStream = new FileOutputStream(PRIVATE_FILE_NAME);
+                FileOutputStream privateFileStream = new FileOutputStream(PRIVATE_FILE_NAME)
         ) {
-            KeyPairGenerator generator = null;
-            generator = KeyPairGenerator.getInstance(cryptoAlgorithm);
+            KeyPairGenerator generator = KeyPairGenerator.getInstance(cryptoAlgorithm);
             generator.initialize(2048);
             KeyPair pair = generator.generateKeyPair();
             privateKey = pair.getPrivate();
             publicKey = pair.getPublic();
             publicFileStream.write(publicKey.getEncoded());
-            privateFileStream.write(publicKey.getEncoded());
+            privateFileStream.write(privateKey.getEncoded());
         } catch (NoSuchAlgorithmException | IOException e) {
             e.printStackTrace();
             throw e;
@@ -67,7 +67,7 @@ public class KeyPairServiceImpl implements KeyPairService {
 
         KeyFactory keyFactory = KeyFactory.getInstance(cryptoAlgorithm);
         EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
-        EncodedKeySpec privateKeySpec = new X509EncodedKeySpec(privateKeyBytes);
+        EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKeyBytes);
 
         publicKey = keyFactory.generatePublic(publicKeySpec);
         privateKey = keyFactory.generatePrivate(privateKeySpec);

@@ -16,7 +16,7 @@ public class LicenseEntity {
     @Column(name = "expiration_date", nullable = false)
     private Date expirationDate;
 
-    @Column(name = "sign", nullable = false)
+    @Column(length = 2048, name = "sign", nullable = false)
     private String sign;
 
     @Column(name = "mail", nullable = false)
@@ -28,7 +28,7 @@ public class LicenseEntity {
     @Column(name="activation_count", nullable = false)
     private int activationCount = 0;
 
-    @Column(name="activated_unique_hardware_id", nullable = true)
+    @Column(name="activated_unique_hardware_id")
     private String activatedUniqueHardwareId;
 
     public boolean activate(String uniqueHardwareId) {
