@@ -70,8 +70,12 @@ public class LicenseController {
     public ResponseEntity<LicenseCheckResponse> checkLicense(
             @RequestParam("file") MultipartFile file
     ) {
-        return ResponseEntity.ok(
-                licenseService.checkLicense(file)
-        );
+        try {
+            return
+                    licenseService.checkLicense(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }
