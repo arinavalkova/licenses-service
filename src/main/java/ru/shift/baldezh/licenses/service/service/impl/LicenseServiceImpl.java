@@ -113,7 +113,8 @@ public class LicenseServiceImpl implements LicenseService {
         return currentDate.after(expirationDate);
     }
 
-    private List<LicenseEntity> getCloseToExpireLicenses() {
+    @Override
+    public List<LicenseEntity> getCloseToExpireLicenses() {
         List<LicenseEntity> closeToExpireLicenses = new ArrayList<>();
         List<LicenseEntity> allLicenses = new ArrayList<>();
         licenseRepository.findAll().forEach(allLicenses::add);
