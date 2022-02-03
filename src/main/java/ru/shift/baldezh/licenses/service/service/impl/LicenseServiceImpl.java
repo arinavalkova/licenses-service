@@ -1,8 +1,9 @@
 package ru.shift.baldezh.licenses.service.service.impl;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 import ru.shift.baldezh.licenses.service.model.LicenseCheckResponse;
+import ru.shift.baldezh.licenses.service.model.forms.license.CheckLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseListForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.NewLicenseForm;
@@ -11,9 +12,11 @@ import ru.shift.baldezh.licenses.service.repository.model.LicenseEntity;
 import ru.shift.baldezh.licenses.service.service.LicenseCryptographyService;
 import ru.shift.baldezh.licenses.service.service.LicenseService;
 
+import javax.crypto.NoSuchPaddingException;
 import javax.persistence.EntityNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -34,7 +37,8 @@ public class LicenseServiceImpl implements LicenseService {
     }
 
     @Override
-    public LicenseEntity generateLicense(NewLicenseForm form) {
+    public LicenseEntity generateLicense(NewLicenseForm form)
+            throws NoSuchPaddingException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         int userId = form.getUserId();
 
         Date currentDate = new Date();
@@ -51,6 +55,10 @@ public class LicenseServiceImpl implements LicenseService {
         licenseEntity.setMail(form.getMail());
 
         licenseEntity.setUserId(userId);
+
+        licenseEntity.setActivationCount(0);
+
+        licenseEntity.setActivatedUniqueHardwareId(null);
 
         licenseEntity = licenseRepository.save(licenseEntity);
 
@@ -75,8 +83,12 @@ public class LicenseServiceImpl implements LicenseService {
     }
 
     @Override
-    public LicenseCheckResponse checkLicense(MultipartFile file) {
-        //TODO
-        return new LicenseCheckResponse();
+    public ResponseEntity<LicenseCheckResponse> checkLicense(CheckLicenseForm form) {
+        //TODO: check if form.licenseEntity is present in database and not expired
+        if (form.getLicense().activate(form.getUniqueHardwareId())) {
+            return ResponseEntity.ok(licenseCryptographyService.getCheckResponse(form));
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

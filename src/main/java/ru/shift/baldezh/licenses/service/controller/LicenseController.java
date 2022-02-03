@@ -2,8 +2,8 @@ package ru.shift.baldezh.licenses.service.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import ru.shift.baldezh.licenses.service.model.LicenseCheckResponse;
+import ru.shift.baldezh.licenses.service.model.forms.license.CheckLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseListForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.NewLicenseForm;
@@ -12,8 +12,6 @@ import ru.shift.baldezh.licenses.service.service.LicenseService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -36,7 +34,7 @@ public class LicenseController {
             response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + ".json\"");
 
             return ResponseEntity.ok(licenseEntity);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
@@ -68,10 +66,8 @@ public class LicenseController {
 
     @PostMapping("check")
     public ResponseEntity<LicenseCheckResponse> checkLicense(
-            @RequestParam("file") MultipartFile file
+            @RequestBody CheckLicenseForm form
     ) {
-        return ResponseEntity.ok(
-                licenseService.checkLicense(file)
-        );
+        return licenseService.checkLicense(form);
     }
 }

@@ -25,6 +25,38 @@ public class LicenseEntity {
     @JoinColumn(name="user_id")
     private long userId;
 
+    @Column(name="activation_count", nullable = false)
+    private int activationCount = 0;
+
+    @Column(name="activated_unique_hardware_id", nullable = true)
+    private String activatedUniqueHardwareId;
+
+    public boolean activate(String uniqueHardwareId) {
+        int count = 1;
+        if (activationCount < count) {
+            activationCount++;
+            activatedUniqueHardwareId = uniqueHardwareId;
+            return true;
+        }
+        return uniqueHardwareId.equals(activatedUniqueHardwareId);
+    }
+
+    public String getActivatedUniqueHardwareId() {
+        return activatedUniqueHardwareId;
+    }
+
+    public void setActivatedUniqueHardwareId(String activatedUniqueHardwareId) {
+        this.activatedUniqueHardwareId = activatedUniqueHardwareId;
+    }
+
+    public int getActivationCount() {
+        return activationCount;
+    }
+
+    public void setActivationCount(int activationCount) {
+        this.activationCount = activationCount;
+    }
+
     public long getLicenseId() {
         return licenseId;
     }

@@ -1,7 +1,10 @@
 package ru.shift.baldezh.licenses.service.service.impl;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import ru.shift.baldezh.licenses.service.service.KeyPairService;
 
+import javax.crypto.KeyGenerator;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,14 +14,20 @@ import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
+@Component
 public class KeyPairServiceImpl implements KeyPairService {
     private final static String PUBLIC_FILE_NAME = "public.key";
     private final static String PRIVATE_FILE_NAME = "private.key";
 
+    private final String cryptoAlgorithm;
+
     private PublicKey publicKey;
     private PrivateKey privateKey;
 
-    public KeyPairServiceImpl() throws IOException, NoSuchAlgorithmException {
+    public KeyPairServiceImpl(
+            @Qualifier("CRYPTO_ALGORITHM") String cryptoAlgorithm
+    ) throws IOException, NoSuchAlgorithmException {
+        this.cryptoAlgorithm = cryptoAlgorithm;
         if (doKeyFilesExist()) {
             try {
                 readKeys();
@@ -36,7 +45,7 @@ public class KeyPairServiceImpl implements KeyPairService {
                 FileOutputStream privateFileStream = new FileOutputStream(PRIVATE_FILE_NAME);
         ) {
             KeyPairGenerator generator = null;
-            generator = KeyPairGenerator.getInstance("RSA");
+            generator = KeyPairGenerator.getInstance(cryptoAlgorithm);
             generator.initialize(2048);
             KeyPair pair = generator.generateKeyPair();
             privateKey = pair.getPrivate();
@@ -56,7 +65,7 @@ public class KeyPairServiceImpl implements KeyPairService {
         File privateKeyFile = new File(PRIVATE_FILE_NAME);
         byte[] privateKeyBytes = Files.readAllBytes(privateKeyFile.toPath());
 
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        KeyFactory keyFactory = KeyFactory.getInstance(cryptoAlgorithm);
         EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
         EncodedKeySpec privateKeySpec = new X509EncodedKeySpec(privateKeyBytes);
 

@@ -5,7 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
-public interface KeyPairService {
+public interface KeyPairService extends PrivateKeyProvider {
     void recreateKeyPair() throws NoSuchAlgorithmException, IOException;
     PublicKey getPublicKey();
     PrivateKey getPrivateKey();
