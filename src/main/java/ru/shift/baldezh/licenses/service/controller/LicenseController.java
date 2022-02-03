@@ -2,7 +2,6 @@ package ru.shift.baldezh.licenses.service.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.shift.baldezh.licenses.service.model.LicenseCheckResponse;
 import ru.shift.baldezh.licenses.service.model.forms.license.CheckLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseListForm;
@@ -12,9 +11,6 @@ import ru.shift.baldezh.licenses.service.service.LicenseService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
 import java.util.List;
 
 @RestController
@@ -48,7 +44,7 @@ public class LicenseController {
             HttpServletResponse response
     ) {
         try {
-            LicenseEntity licenseEntity = licenseService.findLicenseById(form, licenseId);
+            LicenseEntity licenseEntity = licenseService.findLicenseByUserIdAndLicenseId(form, licenseId);
             setFilenameHeader(licenseEntity, response);
             return ResponseEntity.ok(licenseEntity);
         } catch (IOException e) {

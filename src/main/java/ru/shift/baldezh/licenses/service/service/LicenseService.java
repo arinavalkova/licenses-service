@@ -18,7 +18,7 @@ public interface LicenseService {
 
     LicenseEntity generateLicense(NewLicenseForm form) throws IOException, NoSuchPaddingException, NoSuchAlgorithmException, SignatureException, InvalidKeyException;
 
-    LicenseEntity findLicenseById(GetLicenseForm form, long licenseId) throws IOException;
+    LicenseEntity findLicenseByUserIdAndLicenseId(GetLicenseForm form, long licenseId) throws IOException;
 
     List<Long> getLicenseIds(GetLicenseListForm form);
 

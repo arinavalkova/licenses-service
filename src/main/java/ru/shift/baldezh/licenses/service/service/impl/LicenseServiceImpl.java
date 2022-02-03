@@ -16,10 +16,7 @@ import javax.persistence.EntityNotFoundException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -67,7 +64,7 @@ public class LicenseServiceImpl implements LicenseService {
     }
 
     @Override
-    public LicenseEntity findLicenseById(GetLicenseForm form, long licenseId) {
+    public LicenseEntity findLicenseByUserIdAndLicenseId(GetLicenseForm form, long licenseId) {
         long userId = form.getUserId();
         LicenseEntity licenseEntity = licenseRepository.findLicenseEntityByUserIdAndLicenseId(userId, licenseId);
         if (licenseEntity == null) {
@@ -104,7 +101,18 @@ public class LicenseServiceImpl implements LicenseService {
     }
 
     private boolean licenseExists(LicenseEntity license) {
-        return licenseRepository.existsById(license.getLicenseId());
+        Optional<LicenseEntity> optionalLicenseEntity = licenseRepository.findById(license.getLicenseId());
+        if (!optionalLicenseEntity.isPresent()) return false;
+        LicenseEntity licenseFromDataBase = optionalLicenseEntity.get();
+        if (!licenseFromDataBase.getCreationDate().equals(license.getCreationDate())) return false;
+        if (!licenseFromDataBase.getExpirationDate().equals(license.getExpirationDate())) return false;
+        if (!licenseFromDataBase.getSign().equals(license.getSign())) return false;
+        if (!licenseFromDataBase.getMail().equals(license.getMail())) return false;
+        if (licenseFromDataBase.getUserId() != license.getUserId()) return false;
+        if (licenseFromDataBase.getActivationCount() != license.getActivationCount()) return false;
+        if (!licenseFromDataBase.getActivatedUniqueHardwareId().equals(license.getActivatedUniqueHardwareId()))
+            return false;
+        return true;
     }
 
     private boolean licenseExpired(LicenseEntity license) {
