@@ -1,7 +1,7 @@
 package ru.shift.baldezh.licenses.service.service;
 
-import org.springframework.http.ResponseEntity;
 import ru.shift.baldezh.licenses.service.model.LicenseCheckResponse;
+import org.springframework.http.ResponseEntity;
 import ru.shift.baldezh.licenses.service.model.forms.license.CheckLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseListForm;
