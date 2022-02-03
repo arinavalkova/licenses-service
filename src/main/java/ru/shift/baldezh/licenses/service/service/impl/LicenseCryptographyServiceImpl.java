@@ -1,7 +1,6 @@
 package ru.shift.baldezh.licenses.service.service.impl;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import ru.shift.baldezh.licenses.service.model.LicenseCheckResponse;
 import ru.shift.baldezh.licenses.service.model.forms.license.CheckLicenseForm;
@@ -18,36 +17,51 @@ import java.security.SignatureException;
 
 @Component
 public class LicenseCryptographyServiceImpl implements LicenseCryptographyService {
+    private static final String SEPARATOR = ";";
     private final PrivateKeyProvider privateKeyProvider;
     private final String cryptoAlgorithm;
+    private final String signatureAlgorithm;
 
     public LicenseCryptographyServiceImpl(
             PrivateKeyProvider privateKeyProvider,
-            @Qualifier("CRYPTO_ALGORITHM") String cryptoAlgorithm
+            @Qualifier("CRYPTO_ALGORITHM") String cryptoAlgorithm,
+            @Qualifier("SIGNATURE_ALGORITHM") String signatureAlgorithm
     ) {
         this.cryptoAlgorithm = cryptoAlgorithm;
         this.privateKeyProvider = privateKeyProvider;
+        this.signatureAlgorithm = signatureAlgorithm;
     }
 
     @Override
-    public void sign(LicenseEntity entity) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        String data = entity.getLicenseId() + ";" +
-                entity.getMail() + ";" +
-                entity.getCreationDate().toString() + ";" +
-                entity.getExpirationDate().toString();
+    public void sign(LicenseEntity entity)
+            throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         entity.setSign(
+                getSignature(
+                        getLicenseString(entity)));
+    }
+
+    @Override
+    public LicenseCheckResponse getCheckResponse(CheckLicenseForm form)
+            throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+
+        String data = getLicenseString(form.getLicense()) + SEPARATOR + form.getUniqueHardwareId();
+
+        return new LicenseCheckResponse(
+                form.getLicense(), form.getUniqueHardwareId(),
                 getSignature(data)
         );
     }
 
-    @Override
-    public LicenseCheckResponse getCheckResponse(CheckLicenseForm form) {
-
-        return new LicenseCheckResponse();
+    private String getLicenseString(LicenseEntity entity) {
+        return entity.getLicenseId() + SEPARATOR +
+                entity.getMail() + SEPARATOR +
+                entity.getCreationDate().toString() + SEPARATOR +
+                entity.getExpirationDate().toString();
     }
 
-    private String getSignature(String data) throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
-        Signature sig = Signature.getInstance("SHA1WithRSA");
+    private String getSignature(String data)
+            throws InvalidKeyException, NoSuchAlgorithmException, SignatureException {
+        Signature sig = Signature.getInstance(signatureAlgorithm);
         sig.initSign(privateKeyProvider.getPrivateKey());
         sig.update(data.getBytes(StandardCharsets.UTF_8));
         return new BASE64Encoder().encode(sig.sign());

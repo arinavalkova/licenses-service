@@ -11,5 +11,5 @@ import java.security.SignatureException;
 
 public interface LicenseCryptographyService {
     void sign(LicenseEntity entity) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, SignatureException;
-    LicenseCheckResponse getCheckResponse(CheckLicenseForm form);
+    LicenseCheckResponse getCheckResponse(CheckLicenseForm form) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException;
 }

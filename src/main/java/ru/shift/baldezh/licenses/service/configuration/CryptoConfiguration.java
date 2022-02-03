@@ -15,4 +15,9 @@ public class CryptoConfiguration {
     public String getCryptoAlgorithm() {
         return "RSA";
     }
+
+    @Bean(name = "SIGNATURE_ALGORITHM")
+    public String getSignatureAlgorithm() {
+        return "SHA1WithRSA";
+    }
 }
