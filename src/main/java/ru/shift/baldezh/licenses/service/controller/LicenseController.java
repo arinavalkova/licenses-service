@@ -12,6 +12,9 @@ import ru.shift.baldezh.licenses.service.service.LicenseService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.util.List;
 
 @RestController
@@ -65,9 +68,7 @@ public class LicenseController {
     }
 
     @PostMapping("check")
-    public ResponseEntity<LicenseCheckResponse> checkLicense(
-            @RequestBody CheckLicenseForm form
-    ) {
+    public ResponseEntity<?> checkLicense(@RequestBody CheckLicenseForm form) {
         return licenseService.checkLicense(form);
     }
 }

@@ -23,5 +23,5 @@ public interface LicenseService {
 
     List<Long> getLicenseIds(GetLicenseListForm form);
 
-    ResponseEntity<LicenseCheckResponse> checkLicense(CheckLicenseForm form);
+    ResponseEntity<?> checkLicense(CheckLicenseForm form);
 }

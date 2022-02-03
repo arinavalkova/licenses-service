@@ -2,7 +2,6 @@ package ru.shift.baldezh.licenses.service.service.impl;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import ru.shift.baldezh.licenses.service.model.LicenseCheckResponse;
 import ru.shift.baldezh.licenses.service.model.forms.license.CheckLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseListForm;
@@ -83,12 +82,30 @@ public class LicenseServiceImpl implements LicenseService {
     }
 
     @Override
-    public ResponseEntity<LicenseCheckResponse> checkLicense(CheckLicenseForm form) {
-        //TODO: check if form.licenseEntity is present in database and not expired
-        if (form.getLicense().activate(form.getUniqueHardwareId())) {
-            return ResponseEntity.ok(licenseCryptographyService.getCheckResponse(form));
-        } else {
-            return ResponseEntity.badRequest().build();
+    public ResponseEntity<?> checkLicense(CheckLicenseForm form) {
+        try {
+            if (!licenseExists(form.getLicense()))
+                return ResponseEntity.status(418).body("LICENSE_NOT_EXIST");
+
+            if (licenseExpired(form.getLicense()))
+                return ResponseEntity.status(418).body("LICENSE_EXPIRED");
+
+            if (form.getLicense().activate(form.getUniqueHardwareId()))
+                return ResponseEntity.ok(licenseCryptographyService.getCheckResponse(form));
+            else
+                return ResponseEntity.status(418).body("LICENSE_ALREADY_ACTIVATED");
+
+        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("INTERNAL_SERVER_ERROR");
         }
+    }
+
+    private boolean licenseExists(LicenseEntity license) {
+        return true; //TODO: check if license exists
+    }
+
+    private boolean licenseExpired(LicenseEntity license) {
+        return false; //TODO: check if license expired
     }
 }
