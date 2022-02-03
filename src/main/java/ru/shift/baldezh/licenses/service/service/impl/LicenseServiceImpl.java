@@ -67,7 +67,7 @@ public class LicenseServiceImpl implements LicenseService {
     }
 
     @Override
-    public LicenseEntity findLicenseById(GetLicenseForm form, long licenseId) {
+    public LicenseEntity findLicenseByUserIdAndLicenseId(GetLicenseForm form, long licenseId) {
         long userId = form.getUserId();
         LicenseEntity licenseEntity = licenseRepository.findLicenseEntityByUserIdAndLicenseId(userId, licenseId);
         if (licenseEntity == null) {
