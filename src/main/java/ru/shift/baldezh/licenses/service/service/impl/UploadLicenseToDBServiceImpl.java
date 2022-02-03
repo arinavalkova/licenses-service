@@ -30,6 +30,7 @@ public class UploadLicenseToDBServiceImpl implements UploadLicenseService {
     @Scheduled(cron = "${interval-in-cron}")
     @Override
     public void uploadLicense() {
+        uploadLicenseInfoRepository.deleteAll();
         List<UploadLicenseInfoEntity> uploadLicenseInfoEntityList = new ArrayList<>();
         List<LicenseEntity> listOfCloseToExpireLicenses = licenseService.getCloseToExpireLicenses();
         for (LicenseEntity licenseEntity : listOfCloseToExpireLicenses) {
