@@ -33,9 +33,7 @@ public class LicenseController {
             HttpServletResponse response) {
         try {
             LicenseEntity licenseEntity = licenseService.generateLicense(form);
-            String fileName = licenseEntity.getLicenseId() + "_license_for_" + form.getUserId();
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + ".json\"");
-
+            setFilenameHeader(licenseEntity, response);
             return ResponseEntity.ok(licenseEntity);
         } catch (Exception e) {
             e.printStackTrace();
@@ -51,13 +49,17 @@ public class LicenseController {
     ) {
         try {
             LicenseEntity licenseEntity = licenseService.findLicenseById(form, licenseId);
-            String fileName = licenseEntity.getLicenseId() + "_license_for_" + form.getUserId();
-            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + ".json\"");
+            setFilenameHeader(licenseEntity, response);
             return ResponseEntity.ok(licenseEntity);
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    private void setFilenameHeader(LicenseEntity license, HttpServletResponse response) {
+        String fileName = license.getLicenseId() + "_license_for_" + license.getUserId();
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + ".json\"");
     }
 
     @GetMapping("list")
