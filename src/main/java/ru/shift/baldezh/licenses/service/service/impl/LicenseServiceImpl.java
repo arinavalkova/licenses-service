@@ -1,5 +1,7 @@
 package ru.shift.baldezh.licenses.service.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import ru.shift.baldezh.licenses.service.model.LicenseCheckResponse;
@@ -13,7 +15,7 @@ import ru.shift.baldezh.licenses.service.service.LicenseService;
 
 import javax.persistence.EntityNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -75,8 +77,9 @@ public class LicenseServiceImpl implements LicenseService {
     }
 
     @Override
-    public LicenseCheckResponse checkLicense(MultipartFile file) {
-        //TODO
-        return new LicenseCheckResponse();
+    public ResponseEntity<LicenseCheckResponse> checkLicense(MultipartFile file) throws IOException {
+        String content = new String(file.getBytes(), StandardCharsets.UTF_8);
+        LicenseEntity licenseEntity = new ObjectMapper().readValue(content, LicenseEntity.class);
+        return licenseCryptographyService.getCheckResponse(licenseEntity);
     }
 }
