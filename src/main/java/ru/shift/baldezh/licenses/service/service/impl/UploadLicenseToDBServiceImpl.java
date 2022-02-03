@@ -18,11 +18,13 @@ public class UploadLicenseToDBServiceImpl implements UploadLicenseService {
 
     private final LicenseService licenseService;
     private final UserService userService;
-    private UploadLicenseInfoRepository uploadLicenseInfoRepository;
+    private final UploadLicenseInfoRepository uploadLicenseInfoRepository;
 
-    public UploadLicenseToDBServiceImpl(LicenseService licenseService, UserService userService) {
+    public UploadLicenseToDBServiceImpl(LicenseService licenseService, UserService userService,
+                                        UploadLicenseInfoRepository uploadLicenseInfoRepository) {
         this.licenseService = licenseService;
         this.userService = userService;
+        this.uploadLicenseInfoRepository = uploadLicenseInfoRepository;
     }
 
     @Scheduled(cron = "${interval-in-cron}")
