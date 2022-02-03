@@ -16,6 +16,7 @@ import javax.persistence.EntityNotFoundException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 public class LicenseServiceImpl implements LicenseService {
 
     private static final int EXPIRE_TIME_SPAN = 31;
+    private static final int CLOSE_TO_EXPIRE_COUNT_OF_DAYS = 7;
 
     private final LicenseRepository licenseRepository;
     private final LicenseCryptographyService licenseCryptographyService;
@@ -109,5 +111,27 @@ public class LicenseServiceImpl implements LicenseService {
         Date currentDate = new Date();
         Date expirationDate = license.getExpirationDate();
         return currentDate.after(expirationDate);
+    }
+
+    private List<LicenseEntity> getCloseToExpireLicenses() {
+        List<LicenseEntity> closeToExpireLicenses = new ArrayList<>();
+        List<LicenseEntity> allLicenses = new ArrayList<>();
+        licenseRepository.findAll().forEach(allLicenses::add);
+
+        Date todayDate = new Date();
+
+        Calendar c = Calendar.getInstance();
+        c.setTime(todayDate);
+        c.add(Calendar.DAY_OF_MONTH, CLOSE_TO_EXPIRE_COUNT_OF_DAYS);
+        Date endDate = c.getTime();
+
+        for (LicenseEntity licenseEntity : allLicenses) {
+            Date expirationDate = licenseEntity.getExpirationDate();
+            if (expirationDate.after(todayDate) && expirationDate.before(endDate)) {
+                closeToExpireLicenses.add(licenseEntity);
+            }
+        }
+
+        return closeToExpireLicenses;
     }
 }
