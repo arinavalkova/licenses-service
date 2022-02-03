@@ -102,10 +102,12 @@ public class LicenseServiceImpl implements LicenseService {
     }
 
     private boolean licenseExists(LicenseEntity license) {
-        return true; //TODO: check if license exists
+        return licenseRepository.existsById(license.getLicenseId());
     }
 
     private boolean licenseExpired(LicenseEntity license) {
-        return false; //TODO: check if license expired
+        Date currentDate = new Date();
+        Date expirationDate = license.getExpirationDate();
+        return currentDate.after(expirationDate);
     }
 }
