@@ -1,6 +1,5 @@
 package ru.shift.baldezh.licenses.service.service;
 
-import ru.shift.baldezh.licenses.service.model.LicenseCheckResponse;
 import org.springframework.http.ResponseEntity;
 import ru.shift.baldezh.licenses.service.model.forms.license.CheckLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseForm;
@@ -24,4 +23,6 @@ public interface LicenseService {
     List<Long> getLicenseIds(GetLicenseListForm form);
 
     ResponseEntity<?> checkLicense(CheckLicenseForm form);
+
+    List<LicenseEntity> getCloseToExpireLicenses();
 }
