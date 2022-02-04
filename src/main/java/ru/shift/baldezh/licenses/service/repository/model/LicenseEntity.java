@@ -1,5 +1,7 @@
 package ru.shift.baldezh.licenses.service.repository.model;
 
+import ru.shift.baldezh.licenses.service.model.LicenseType;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -31,14 +33,25 @@ public class LicenseEntity {
     @Column(name="activated_unique_hardware_id")
     private String activatedUniqueHardwareId;
 
+    @Column(name="license_type", nullable = false)
+    private LicenseType licenseType;
+
     public boolean activate(String uniqueHardwareId) {
-        int count = 1;
+        int count = licenseType.getCount();
         if (activationCount < count) {
             activationCount++;
             activatedUniqueHardwareId = uniqueHardwareId;
             return true;
         }
         return uniqueHardwareId.equals(activatedUniqueHardwareId);
+    }
+
+    public LicenseType getLicenseType() {
+        return licenseType;
+    }
+
+    public void setLicenseType(LicenseType licenseType) {
+        this.licenseType = licenseType;
     }
 
     public String getActivatedUniqueHardwareId() {
