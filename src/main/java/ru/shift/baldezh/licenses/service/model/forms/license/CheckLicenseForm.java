@@ -6,6 +6,14 @@ public class CheckLicenseForm {
     private LicenseEntity license;
     private String uniqueHardwareId;
 
+    public CheckLicenseForm() {
+    }
+
+    public CheckLicenseForm(LicenseEntity license, String uniqueHardwareId) {
+        this.license = license;
+        this.uniqueHardwareId = uniqueHardwareId;
+    }
+
     public LicenseEntity getLicense() {
         return license;
     }
