@@ -2,16 +2,14 @@ package ru.shift.baldezh.licenses.product;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.shift.baldezh.licenses.library.LicenseChecker;
-import ru.shift.baldezh.licenses.service.model.forms.license.CheckLicenseForm;
+import ru.shift.baldezh.licenses.library.ServerResponseBody;
 import ru.shift.baldezh.licenses.service.repository.model.LicenseEntity;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
@@ -28,14 +26,23 @@ public class LicenseProduct {
     private static LicenseEntity licenseEntity;
 
     public static void main(String[] args) {
-        if (isLicenseValid(args)) {
+        ServerResponseBody serverResponseBody = isLicenseValid(args);
+        if (serverResponseBody == ServerResponseBody.ACTIVATED) {
             work();
-        } else {
-            buy();
+        } else if (serverResponseBody == ServerResponseBody.INTERNAL_SERVER_ERROR) {
+            System.out.println("Server error");
+        } else if (serverResponseBody == ServerResponseBody.LICENSE_EXPIRED) {
+            System.out.println("Your license has expired. Buy it on our website");
+        } else if (serverResponseBody == ServerResponseBody.LICENSE_ALREADY_ACTIVATED) {
+            System.out.println("Your license has already activated. Buy another one on our website");
+        } else if (serverResponseBody == ServerResponseBody.LICENSE_NOT_EXIST) {
+            System.out.println("License not exists");
+        } else if (serverResponseBody == ServerResponseBody.BAD_DECODE_LICENSE) {
+            System.out.println("Warning! Bad decoded license");
         }
     }
 
-    private static boolean isLicenseValid(String[] args) {
+    private static ServerResponseBody isLicenseValid(String[] args) {
         try {
             publicKey = findPublicKey();
             uniqueHardwareId = args[0];
@@ -44,9 +51,10 @@ public class LicenseProduct {
             LicenseChecker licenseChecker = new LicenseChecker();
             return licenseChecker.isActivated(publicKey, licenseEntity, uniqueHardwareId);
 
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException
+                | InvalidKeyException | SignatureException e) {
             e.printStackTrace();
-            return false;
+            return ServerResponseBody.INTERNAL_SERVER_ERROR;
         }
     }
 
@@ -65,9 +73,5 @@ public class LicenseProduct {
 
     private static void work() {
         System.out.println("License is valid. Welcome!");
-    }
-
-    private static void buy() {
-        System.out.println("Your license has expired. Buy it on our website");
     }
 }
