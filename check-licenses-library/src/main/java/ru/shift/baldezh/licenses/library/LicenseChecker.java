@@ -55,9 +55,6 @@ public class LicenseChecker {
         if (!licenseFromSign.getSign().equals(licenseEntity.getSign())) return false;
         if (!licenseFromSign.getMail().equals(licenseEntity.getMail())) return false;
         if (licenseFromSign.getUserId() != licenseEntity.getUserId()) return false;
-        if (licenseFromSign.getActivationCount() != licenseEntity.getActivationCount()) return false;
-        if (!licenseFromSign.getActivatedUniqueHardwareId().equals(licenseEntity.getActivatedUniqueHardwareId()))
-            return false;
         return true;
     }
 
