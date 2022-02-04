@@ -7,6 +7,7 @@ import ru.shift.baldezh.licenses.service.model.forms.license.CheckLicenseForm;
 import ru.shift.baldezh.licenses.service.repository.model.LicenseEntity;
 import ru.shift.baldezh.licenses.service.service.LicenseCryptographyService;
 import ru.shift.baldezh.licenses.service.service.PrivateKeyProvider;
+import ru.shift.baldezh.licenses.service.service.SignatureDataBuilder;
 import sun.misc.BASE64Encoder;
 
 import java.nio.charset.StandardCharsets;
@@ -17,19 +18,20 @@ import java.security.SignatureException;
 
 @Component
 public class LicenseCryptographyServiceImpl implements LicenseCryptographyService {
-    private static final String SEPARATOR = ";";
     private final PrivateKeyProvider privateKeyProvider;
     private final String cryptoAlgorithm;
     private final String signatureAlgorithm;
+    private final SignatureDataBuilder signatureDataBuilder;
 
     public LicenseCryptographyServiceImpl(
             PrivateKeyProvider privateKeyProvider,
             @Qualifier("CRYPTO_ALGORITHM") String cryptoAlgorithm,
-            @Qualifier("SIGNATURE_ALGORITHM") String signatureAlgorithm
-    ) {
+            @Qualifier("SIGNATURE_ALGORITHM") String signatureAlgorithm,
+            SignatureDataBuilder signatureDataBuilder) {
         this.cryptoAlgorithm = cryptoAlgorithm;
         this.privateKeyProvider = privateKeyProvider;
         this.signatureAlgorithm = signatureAlgorithm;
+        this.signatureDataBuilder = signatureDataBuilder;
     }
 
     @Override
@@ -37,26 +39,19 @@ public class LicenseCryptographyServiceImpl implements LicenseCryptographyServic
             throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         entity.setSign(
                 getSignature(
-                        getLicenseString(entity)));
+                        signatureDataBuilder.getLicenseString(entity)));
     }
 
     @Override
     public LicenseCheckResponse getCheckResponse(CheckLicenseForm form)
             throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
 
-        String data = getLicenseString(form.getLicense()) + SEPARATOR + form.getUniqueHardwareId();
+        String data = signatureDataBuilder.getResponseString(form.getLicense(), form.getUniqueHardwareId());
 
         return new LicenseCheckResponse(
                 form.getLicense(), form.getUniqueHardwareId(),
                 getSignature(data)
         );
-    }
-
-    private String getLicenseString(LicenseEntity entity) {
-        return entity.getLicenseId() + SEPARATOR +
-                entity.getMail() + SEPARATOR +
-                entity.getCreationDate().toString() + SEPARATOR +
-                entity.getExpirationDate().toString();
     }
 
     private String getSignature(String data)

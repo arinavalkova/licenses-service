@@ -10,6 +10,7 @@ import ru.shift.baldezh.licenses.service.repository.LicenseRepository;
 import ru.shift.baldezh.licenses.service.repository.model.LicenseEntity;
 import ru.shift.baldezh.licenses.service.service.LicenseCryptographyService;
 import ru.shift.baldezh.licenses.service.service.LicenseService;
+import ru.shift.baldezh.licenses.service.service.LicenseValidator;
 
 import javax.crypto.NoSuchPaddingException;
 import javax.persistence.EntityNotFoundException;
@@ -27,11 +28,13 @@ public class LicenseServiceImpl implements LicenseService {
 
     private final LicenseRepository licenseRepository;
     private final LicenseCryptographyService licenseCryptographyService;
+    private final LicenseValidator licenseValidator;
 
 
-    public LicenseServiceImpl(LicenseRepository licenseRepository, LicenseCryptographyService licenseCryptographyService) {
+    public LicenseServiceImpl(LicenseRepository licenseRepository, LicenseCryptographyService licenseCryptographyService, LicenseValidator licenseValidator) {
         this.licenseRepository = licenseRepository;
         this.licenseCryptographyService = licenseCryptographyService;
+        this.licenseValidator = licenseValidator;
     }
 
     @Override
@@ -99,7 +102,7 @@ public class LicenseServiceImpl implements LicenseService {
             if (!optionalLicenseEntity.isPresent())
                 return ResponseEntity.status(418).body("LICENSE_NOT_EXIST");
 
-            if (!licenseValid(optionalLicenseEntity.get(), form.getLicense()))
+            if (!licenseValidator.licenseValid(optionalLicenseEntity.get(), form.getLicense()))
                 return ResponseEntity.status(418).body("LICENSE_NOT_EXIST");
 
             if (licenseExpired(optionalLicenseEntity.get()))
@@ -118,14 +121,6 @@ public class LicenseServiceImpl implements LicenseService {
         }
     }
 
-    private boolean licenseValid(LicenseEntity licenseFromDataBase, LicenseEntity license) {
-        if (licenseFromDataBase.getCreationDate().getTime() != license.getCreationDate().getTime()) return false;
-        if (licenseFromDataBase.getExpirationDate().getTime() != license.getExpirationDate().getTime()) return false;
-        if (!licenseFromDataBase.getMail().equals(license.getMail())) return false;
-        if (licenseFromDataBase.getUserId() != license.getUserId()) return false;
-        if (!licenseFromDataBase.getSign().equals(license.getSign())) return false;
-        return true;
-    }
 
     private boolean licenseExpired(LicenseEntity license) {
         Date currentDate = new Date();
