@@ -3,6 +3,7 @@ package ru.shift.baldezh.licenses.product;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.shift.baldezh.licenses.library.LicenseChecker;
 import ru.shift.baldezh.licenses.service.model.forms.license.CheckLicenseForm;
+import ru.shift.baldezh.licenses.service.repository.model.LicenseEntity;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,7 +25,7 @@ public class LicenseProduct {
 
     private static PublicKey publicKey;
     private static String uniqueHardwareId;
-    private static CheckLicenseForm checkLicenseForm;
+    private static LicenseEntity licenseEntity;
 
     public static void main(String[] args) {
         if (isLicenseValid(args)) {
@@ -38,10 +39,10 @@ public class LicenseProduct {
         try {
             publicKey = findPublicKey();
             uniqueHardwareId = args[0];
-            checkLicenseForm = findCheckLicenseForm();
+            licenseEntity = findLicenseEntity();
 
             LicenseChecker licenseChecker = new LicenseChecker();
-            return licenseChecker.isActivated(publicKey, checkLicenseForm, uniqueHardwareId);
+            return licenseChecker.isActivated(publicKey, licenseEntity, uniqueHardwareId);
 
         } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             e.printStackTrace();
@@ -49,9 +50,9 @@ public class LicenseProduct {
         }
     }
 
-    private static CheckLicenseForm findCheckLicenseForm() throws IOException {
+    private static LicenseEntity findLicenseEntity() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(Paths.get(LICENSE_FILE_NAME).toFile(), CheckLicenseForm.class);
+        return mapper.readValue(Paths.get(LICENSE_FILE_NAME).toFile(), LicenseEntity.class);
     }
 
     private static PublicKey findPublicKey() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
