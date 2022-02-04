@@ -1,9 +1,11 @@
 package ru.shift.baldezh.licenses.service.repository.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ru.shift.baldezh.licenses.service.model.LicenseType;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "license")
@@ -24,26 +26,30 @@ public class LicenseEntity {
     @Column(name = "mail", nullable = false)
     private String mail;
 
-    @JoinColumn(name="user_id")
+    @JoinColumn(name = "user_id")
     private long userId;
 
-    @Column(name="activation_count", nullable = false)
-    private int activationCount = 0;
+    @JsonIgnore
+    @OneToMany(mappedBy = "license", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    private Set<UniqueHardwareIdEntity> activatedHardwareIds;
 
-    @Column(name="activated_unique_hardware_id")
-    private String activatedUniqueHardwareId;
-
-    @Column(name="license_type", nullable = false)
+    @Column(name = "license_type", nullable = false)
     private LicenseType licenseType;
 
     public boolean activate(String uniqueHardwareId) {
         int count = licenseType.getCount();
+        int activationCount = activatedHardwareIds.size();
+        boolean thisIdAlreadyActivated = activatedHardwareIds.stream()
+                .anyMatch(e -> e.getActivatedUniqueHardwareId().equals(uniqueHardwareId));
+        if (thisIdAlreadyActivated) return true;
         if (activationCount < count) {
-            activationCount++;
-            activatedUniqueHardwareId = uniqueHardwareId;
+            UniqueHardwareIdEntity entity = new UniqueHardwareIdEntity();
+            entity.setActivatedUniqueHardwareId(uniqueHardwareId);
+            entity.setLicense(this);
+            activatedHardwareIds.add(entity);
             return true;
         }
-        return uniqueHardwareId.equals(activatedUniqueHardwareId);
+        return false;
     }
 
     public LicenseType getLicenseType() {
@@ -54,20 +60,12 @@ public class LicenseEntity {
         this.licenseType = licenseType;
     }
 
-    public String getActivatedUniqueHardwareId() {
-        return activatedUniqueHardwareId;
+    public Set<UniqueHardwareIdEntity> getActivatedHardwareIds() {
+        return activatedHardwareIds;
     }
 
-    public void setActivatedUniqueHardwareId(String activatedUniqueHardwareId) {
-        this.activatedUniqueHardwareId = activatedUniqueHardwareId;
-    }
-
-    public int getActivationCount() {
-        return activationCount;
-    }
-
-    public void setActivationCount(int activationCount) {
-        this.activationCount = activationCount;
+    public void setActivatedHardwareIds(Set<UniqueHardwareIdEntity> activatedHardwareIds) {
+        this.activatedHardwareIds = activatedHardwareIds;
     }
 
     public long getLicenseId() {

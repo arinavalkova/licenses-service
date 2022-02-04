@@ -54,9 +54,9 @@ public class LicenseServiceImpl implements LicenseService {
 
         licenseEntity.setUserId(userId);
 
-        licenseEntity.setActivationCount(0);
+        licenseEntity.setActivatedHardwareIds(new HashSet<>());
 
-        licenseEntity.setActivatedUniqueHardwareId(null);
+        licenseEntity.setLicenseType(form.getLicenseType());
 
         licenseEntity = licenseRepository.save(licenseEntity);
 
@@ -83,15 +83,22 @@ public class LicenseServiceImpl implements LicenseService {
     @Override
     public ResponseEntity<?> checkLicense(CheckLicenseForm form) {
         try {
-            if (!licenseExists(form.getLicense()))
+            Optional<LicenseEntity> optionalLicenseEntity = licenseRepository.findById(form.getLicense().getLicenseId());
+
+            if (!optionalLicenseEntity.isPresent())
                 return ResponseEntity.status(418).body("LICENSE_NOT_EXIST");
 
-            if (licenseExpired(form.getLicense()))
+            if (!licenseValid(optionalLicenseEntity.get(), form.getLicense()))
+                return ResponseEntity.status(418).body("LICENSE_NOT_EXIST");
+
+            if (licenseExpired(optionalLicenseEntity.get()))
                 return ResponseEntity.status(418).body("LICENSE_EXPIRED");
 
-            if (form.getLicense().activate(form.getUniqueHardwareId()))
+            boolean activationResult = optionalLicenseEntity.get().activate(form.getUniqueHardwareId());
+            if (activationResult) {
+                licenseRepository.save(optionalLicenseEntity.get());
                 return ResponseEntity.ok(licenseCryptographyService.getCheckResponse(form));
-            else
+            } else
                 return ResponseEntity.status(418).body("LICENSE_ALREADY_ACTIVATED");
 
         } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
@@ -100,18 +107,12 @@ public class LicenseServiceImpl implements LicenseService {
         }
     }
 
-    private boolean licenseExists(LicenseEntity license) {
-        Optional<LicenseEntity> optionalLicenseEntity = licenseRepository.findById(license.getLicenseId());
-        if (!optionalLicenseEntity.isPresent()) return false;
-        LicenseEntity licenseFromDataBase = optionalLicenseEntity.get();
-        if (!licenseFromDataBase.getCreationDate().equals(license.getCreationDate())) return false;
-        if (!licenseFromDataBase.getExpirationDate().equals(license.getExpirationDate())) return false;
-        if (!licenseFromDataBase.getSign().equals(license.getSign())) return false;
+    private boolean licenseValid(LicenseEntity licenseFromDataBase, LicenseEntity license) {
+        if (licenseFromDataBase.getCreationDate().getTime() != license.getCreationDate().getTime()) return false;
+        if (licenseFromDataBase.getExpirationDate().getTime() != license.getExpirationDate().getTime()) return false;
         if (!licenseFromDataBase.getMail().equals(license.getMail())) return false;
         if (licenseFromDataBase.getUserId() != license.getUserId()) return false;
-        if (licenseFromDataBase.getActivationCount() != license.getActivationCount()) return false;
-        if (!licenseFromDataBase.getActivatedUniqueHardwareId().equals(license.getActivatedUniqueHardwareId()))
-            return false;
+        if (!licenseFromDataBase.getSign().equals(license.getSign())) return false;
         return true;
     }
 
