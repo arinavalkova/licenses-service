@@ -37,6 +37,17 @@ public class LicenseServiceImpl implements LicenseService {
     @Override
     public LicenseEntity generateLicense(NewLicenseForm form)
             throws NoSuchPaddingException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+        LicenseEntity license = null;
+        Integer count = form.getCount();
+        if (count == null) count = 1;
+        for (int i = 0; i < count; i++) {
+            license = createLicenseEntity(form);
+        }
+        return license;
+    }
+
+    private LicenseEntity createLicenseEntity(NewLicenseForm form)
+            throws NoSuchPaddingException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         int userId = form.getUserId();
 
         Date currentDate = new Date();

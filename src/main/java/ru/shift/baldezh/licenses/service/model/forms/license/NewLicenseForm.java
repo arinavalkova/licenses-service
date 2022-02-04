@@ -9,6 +9,16 @@ public class NewLicenseForm {
 
     private LicenseType licenseType;
 
+    private Integer count;
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
     public LicenseType getLicenseType() {
         return licenseType;
     }
