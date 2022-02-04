@@ -10,6 +10,4 @@ public class GetLicenseListForm {
     }
 
     private long userId;
-
-
 }

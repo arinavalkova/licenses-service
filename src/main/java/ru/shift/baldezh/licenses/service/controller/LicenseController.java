@@ -2,10 +2,7 @@ package ru.shift.baldezh.licenses.service.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.shift.baldezh.licenses.service.model.forms.license.CheckLicenseForm;
-import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseForm;
-import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseListForm;
-import ru.shift.baldezh.licenses.service.model.forms.license.NewLicenseForm;
+import ru.shift.baldezh.licenses.service.model.forms.license.*;
 import ru.shift.baldezh.licenses.service.repository.model.LicenseEntity;
 import ru.shift.baldezh.licenses.service.service.LicenseService;
 
