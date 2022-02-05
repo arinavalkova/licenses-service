@@ -36,7 +36,7 @@ public class LicenseEntity {
     @Column(name = "license_type", nullable = false)
     private LicenseType licenseType;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "license_product",
     joinColumns = @JoinColumn(name = "license_id"),
     inverseJoinColumns = @JoinColumn(name = "product_id"))

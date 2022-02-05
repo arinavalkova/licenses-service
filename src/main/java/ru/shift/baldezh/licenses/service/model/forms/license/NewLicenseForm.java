@@ -2,6 +2,8 @@ package ru.shift.baldezh.licenses.service.model.forms.license;
 
 import ru.shift.baldezh.licenses.service.model.LicenseType;
 
+import java.util.Set;
+
 public class NewLicenseForm {
     private int userId;
 
@@ -11,12 +13,22 @@ public class NewLicenseForm {
 
     private Integer count;
 
-    public Integer getCount() {
-        return count;
+    private Set<Long> productIds;
+
+    public Set<Long> getProductIds() {
+        return productIds;
     }
 
-    public void setCount(int count) {
+    public void setProductIds(Set<Long> productIds) {
+        this.productIds = productIds;
+    }
+
+    public void setCount(Integer count) {
         this.count = count;
+    }
+
+    public Integer getCount() {
+        return count;
     }
 
     public LicenseType getLicenseType() {

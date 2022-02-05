@@ -7,7 +7,9 @@ import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.GetLicenseListForm;
 import ru.shift.baldezh.licenses.service.model.forms.license.NewLicenseForm;
 import ru.shift.baldezh.licenses.service.repository.LicenseRepository;
+import ru.shift.baldezh.licenses.service.repository.ProductRepository;
 import ru.shift.baldezh.licenses.service.repository.model.LicenseEntity;
+import ru.shift.baldezh.licenses.service.repository.model.Product;
 import ru.shift.baldezh.licenses.service.service.LicenseCryptographyService;
 import ru.shift.baldezh.licenses.service.service.LicenseService;
 import ru.shift.baldezh.licenses.service.service.LicenseValidator;
@@ -31,7 +33,9 @@ public class LicenseServiceImpl implements LicenseService {
     private final LicenseValidator licenseValidator;
 
 
-    public LicenseServiceImpl(LicenseRepository licenseRepository, LicenseCryptographyService licenseCryptographyService, LicenseValidator licenseValidator) {
+    public LicenseServiceImpl(LicenseRepository licenseRepository,
+                              LicenseCryptographyService licenseCryptographyService,
+                              LicenseValidator licenseValidator) {
         this.licenseRepository = licenseRepository;
         this.licenseCryptographyService = licenseCryptographyService;
         this.licenseValidator = licenseValidator;
@@ -72,7 +76,15 @@ public class LicenseServiceImpl implements LicenseService {
 
         licenseEntity.setLicenseType(form.getLicenseType());
 
+        Set<Product> setOfProductsWithIds = form
+                .getProductIds()
+                .stream().map(Product::new)
+                .collect(Collectors.toSet());
+
+        licenseEntity.setProducts(setOfProductsWithIds);
+
         licenseEntity = licenseRepository.save(licenseEntity);
+        licenseEntity = licenseRepository.findById(licenseEntity.getLicenseId()).get();
 
         return licenseEntity;
     }

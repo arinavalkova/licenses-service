@@ -19,6 +19,18 @@ public class Product {
     @Column(nullable = false)
     private String productVersion;
 
+    public Product() {
+    }
+
+    public Product(@NonNull String productName, @NonNull String productVersion) {
+        this.productName = productName;
+        this.productVersion = productVersion;
+    }
+
+    public Product(Long id) {
+        this.productId = id;
+    }
+
     public long getProductId() {
         return productId;
     }
