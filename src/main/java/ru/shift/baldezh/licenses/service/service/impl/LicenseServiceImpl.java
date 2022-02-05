@@ -31,14 +31,17 @@ public class LicenseServiceImpl implements LicenseService {
     private final LicenseRepository licenseRepository;
     private final LicenseCryptographyService licenseCryptographyService;
     private final LicenseValidator licenseValidator;
+    private final ProductRepository productRepository;
 
 
     public LicenseServiceImpl(LicenseRepository licenseRepository,
                               LicenseCryptographyService licenseCryptographyService,
-                              LicenseValidator licenseValidator) {
+                              LicenseValidator licenseValidator,
+                              ProductRepository productRepository) {
         this.licenseRepository = licenseRepository;
         this.licenseCryptographyService = licenseCryptographyService;
         this.licenseValidator = licenseValidator;
+        this.productRepository = productRepository;
     }
 
     @Override
@@ -78,7 +81,7 @@ public class LicenseServiceImpl implements LicenseService {
 
         Set<Product> setOfProductsWithIds = form
                 .getProductIds()
-                .stream().map(Product::new)
+                .stream().map(id -> productRepository.findById(id).get())
                 .collect(Collectors.toSet());
 
         licenseEntity.setProducts(setOfProductsWithIds);
