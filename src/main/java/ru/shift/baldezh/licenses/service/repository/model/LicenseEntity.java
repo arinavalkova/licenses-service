@@ -12,7 +12,7 @@ import java.util.Set;
 public class LicenseEntity {
     @Id
     @GeneratedValue
-    private long licenseId;
+    private Long licenseId;
 
     @Column(name = "creation_date", nullable = false)
     private Date creationDate;
@@ -27,7 +27,7 @@ public class LicenseEntity {
     private String mail;
 
     @JoinColumn(name = "user_id")
-    private long userId;
+    private Long userId;
 
     @JsonIgnore
     @OneToMany(mappedBy = "license", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
@@ -82,11 +82,11 @@ public class LicenseEntity {
         this.activatedHardwareIds = activatedHardwareIds;
     }
 
-    public long getLicenseId() {
+    public Long getLicenseId() {
         return licenseId;
     }
 
-    public void setLicenseId(long licenseId) {
+    public void setLicenseId(Long licenseId) {
         this.licenseId = licenseId;
     }
 
@@ -122,11 +122,11 @@ public class LicenseEntity {
         this.mail = mail;
     }
 
-    public long getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 }
