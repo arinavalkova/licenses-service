@@ -1,5 +1,6 @@
 package ru.shift.baldezh.licenses.service.service.impl;
 
+import org.springframework.stereotype.Component;
 import ru.shift.baldezh.licenses.service.repository.ProductRepository;
 import ru.shift.baldezh.licenses.service.repository.model.Product;
 import ru.shift.baldezh.licenses.service.service.ProductService;
@@ -9,6 +10,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@Component
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository repository;
 
