@@ -28,8 +28,6 @@ public class LicenseChecker {
     public ServerResponseBody isActivated(PublicKey publicKey, LicenseEntity licenseEntity, String uniqueHardwareId, Product product)
             throws IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 
-        if (!checkIfLicenseCoversCurrentProduct(product, licenseEntity))
-            return ServerResponseBody.WRONG_LICENSE_PRODUCT;
 
         CheckLicenseForm checkLicenseForm = new CheckLicenseForm(licenseEntity, uniqueHardwareId);
 
@@ -42,6 +40,9 @@ public class LicenseChecker {
 
         LicenseCheckResponse licenseCheckResponse =
                 new ObjectMapper().readValue(response.getBody(), LicenseCheckResponse.class);
+
+        if (!checkIfLicenseCoversCurrentProduct(product, licenseCheckResponse.getLicense()))
+            return ServerResponseBody.WRONG_LICENSE_PRODUCT;
 
         final boolean responseIsValid = validateResponse(licenseCheckResponse, licenseEntity, publicKey);
 
