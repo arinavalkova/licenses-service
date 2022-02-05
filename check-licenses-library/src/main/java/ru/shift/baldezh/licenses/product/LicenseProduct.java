@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ru.shift.baldezh.licenses.library.LicenseChecker;
 import ru.shift.baldezh.licenses.library.ServerResponseBody;
 import ru.shift.baldezh.licenses.service.repository.model.LicenseEntity;
+import ru.shift.baldezh.licenses.service.repository.model.Product;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,9 +48,10 @@ public class LicenseProduct {
             publicKey = findPublicKey();
             uniqueHardwareId = args[0];
             licenseEntity = findLicenseEntity();
+            Product product = new Product("minecraft", "1.18.1");
 
             LicenseChecker licenseChecker = new LicenseChecker();
-            return licenseChecker.isActivated(publicKey, licenseEntity, uniqueHardwareId);
+            return licenseChecker.isActivated(publicKey, licenseEntity, uniqueHardwareId, product);
 
         } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException
                 | InvalidKeyException | SignatureException e) {

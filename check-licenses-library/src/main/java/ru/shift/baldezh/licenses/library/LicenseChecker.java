@@ -1,6 +1,5 @@
 package ru.shift.baldezh.licenses.library;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +7,7 @@ import org.springframework.web.client.RestTemplate;
 import ru.shift.baldezh.licenses.service.model.LicenseCheckResponse;
 import ru.shift.baldezh.licenses.service.model.forms.license.CheckLicenseForm;
 import ru.shift.baldezh.licenses.service.repository.model.LicenseEntity;
+import ru.shift.baldezh.licenses.service.repository.model.Product;
 import ru.shift.baldezh.licenses.service.service.LicenseValidator;
 import ru.shift.baldezh.licenses.service.service.SignatureDataBuilder;
 import ru.shift.baldezh.licenses.service.service.impl.LicenseValidatorImpl;
@@ -25,8 +25,11 @@ public class LicenseChecker {
     private final SignatureDataBuilder signatureDataBuilder = new SignatureDataBuilderImpl();
     private final LicenseValidator licenseValidator = new LicenseValidatorImpl();
 
-    public ServerResponseBody isActivated(PublicKey publicKey, LicenseEntity licenseEntity, String uniqueHardwareId)
+    public ServerResponseBody isActivated(PublicKey publicKey, LicenseEntity licenseEntity, String uniqueHardwareId, Product product)
             throws IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+
+        if (checkIfLicenseCoversCurrentProduct(product, licenseEntity))
+            return ServerResponseBody.WRONG_LICENSE_PRODUCT;
 
         CheckLicenseForm checkLicenseForm = new CheckLicenseForm(licenseEntity, uniqueHardwareId);
 
@@ -47,6 +50,14 @@ public class LicenseChecker {
         } else {
             return ServerResponseBody.BAD_DECODE_LICENSE;
         }
+    }
+
+    private boolean checkIfLicenseCoversCurrentProduct(Product product, LicenseEntity license) {
+        return license.getProducts().stream().anyMatch(
+                p ->
+                        p.getProductName().equals(product.getProductName()) &&
+                                p.getProductVersion().equals(product.getProductVersion())
+        );
     }
 
     private boolean validateResponse(LicenseCheckResponse licenseCheckResponse, LicenseEntity localLicense, PublicKey publicKey) throws NoSuchAlgorithmException, SignatureException, IOException, InvalidKeyException {
