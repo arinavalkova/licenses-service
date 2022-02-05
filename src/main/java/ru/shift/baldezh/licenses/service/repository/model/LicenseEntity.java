@@ -36,6 +36,12 @@ public class LicenseEntity {
     @Column(name = "license_type", nullable = false)
     private LicenseType licenseType;
 
+    @ManyToMany
+    @JoinTable(name = "license_product",
+    joinColumns = @JoinColumn(name = "license_id"),
+    inverseJoinColumns = @JoinColumn(name = "product_id"))
+    private Set<Product> products;
+
     public boolean activate(String uniqueHardwareId) {
         int count = licenseType.getCount();
         int activationCount = activatedHardwareIds.size();
@@ -50,6 +56,14 @@ public class LicenseEntity {
             return true;
         }
         return false;
+    }
+
+    public Set<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(Set<Product> products) {
+        this.products = products;
     }
 
     public LicenseType getLicenseType() {
