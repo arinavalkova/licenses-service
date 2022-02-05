@@ -40,6 +40,8 @@ public class LicenseProduct {
             System.out.println("License not exists");
         } else if (serverResponseBody == ServerResponseBody.BAD_DECODE_LICENSE) {
             System.out.println("Warning! Bad decoded license");
+        } else if (serverResponseBody == ServerResponseBody.WRONG_LICENSE_PRODUCT) {
+            System.out.println("License doesn't cover current product and version");
         }
     }
 

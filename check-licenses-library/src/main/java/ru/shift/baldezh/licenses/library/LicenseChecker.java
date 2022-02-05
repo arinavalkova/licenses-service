@@ -28,7 +28,7 @@ public class LicenseChecker {
     public ServerResponseBody isActivated(PublicKey publicKey, LicenseEntity licenseEntity, String uniqueHardwareId, Product product)
             throws IOException, NoSuchAlgorithmException, InvalidKeyException, SignatureException {
 
-        if (checkIfLicenseCoversCurrentProduct(product, licenseEntity))
+        if (!checkIfLicenseCoversCurrentProduct(product, licenseEntity))
             return ServerResponseBody.WRONG_LICENSE_PRODUCT;
 
         CheckLicenseForm checkLicenseForm = new CheckLicenseForm(licenseEntity, uniqueHardwareId);
